@@ -215,12 +215,6 @@ main {
   font: 700 clamp(28px, 3.4vw, 40px)/1.15 var(--serif);
   letter-spacing: -0.01em;
 }
-.authors {
-  margin: 14px 0 0;
-  font: 500 16px/1.4 var(--sans);
-  color: var(--ink-2);
-}
-
 .part-title {
   margin: 80px 0 12px;
   padding-top: 18px;
@@ -250,7 +244,7 @@ p { margin: 0 0 14px; }
 .hb-note { color: var(--ink-2); }
 
 /* text added for the appendix */
-.ed-note, .doc-note {
+.ed-note {
   max-width: 46rem;
   margin: 12px 0 18px;
   padding: 10px 14px;
@@ -259,7 +253,6 @@ p { margin: 0 0 14px; }
   color: var(--ink-2);
   font: 14.5px/1.5 var(--sans);
 }
-.doc-note { margin: 22px 0 0; }
 .table-note {
   margin: -8px 0 18px;
   color: var(--ink-2);
