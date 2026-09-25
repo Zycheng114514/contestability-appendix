@@ -20,9 +20,14 @@
   let active = null;
   let holdUntil = 0; // while a clicked link scrolls the page, keep its entry marked
 
+  // Height of whatever stays fixed at the top: the contents bar on narrow screens, the row of page buttons otherwise.
+  function topInset() {
+    if (narrow.matches) return 52;
+    return parseFloat(getComputedStyle(document.body).getPropertyValue("--bar-h")) || 0;
+  }
+
   function readingLine() {
-    const top = narrow.matches ? 52 : 0;
-    return top + Math.min(Math.max(window.innerHeight * 0.22, 80), 200);
+    return topInset() + Math.min(Math.max(window.innerHeight * 0.22, 80), 200);
   }
 
   function pick() {
@@ -131,5 +136,22 @@
       holdUntil = performance.now() + (reduced.matches ? 0 : 1200);
     }
     openNav(false);
+  });
+
+  // Links within the page scroll there smoothly. A link opened from elsewhere (…#sec-iv-b) jumps at once,
+  // which is why smooth scrolling is not set for the whole page in the stylesheet.
+  document.addEventListener("click", (ev) => {
+    if (ev.defaultPrevented || ev.button !== 0 || ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.altKey) return;
+    const a = ev.target.closest('a[href^="#"]');
+    if (!a || a.target) return;
+    const el = document.getElementById(decodeURIComponent(a.hash.slice(1)));
+    if (!el) return;
+    ev.preventDefault();
+    const smooth = !reduced.matches;
+    const startY = window.scrollY;
+    el.scrollIntoView({ behavior: smooth ? "smooth" : "auto", block: "start" });
+    // Where the browser does not animate the scroll (some embedded views), jump instead of staying put.
+    if (smooth) setTimeout(() => { if (window.scrollY === startY) el.scrollIntoView({ block: "start" }); }, 700);
+    if (location.hash !== a.hash) history.pushState(null, "", a.hash);
   });
 })();

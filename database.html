@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Database · Online Appendix</title>
+<meta name="description" content="The project database behind the Contestability Index: what each table holds, the rows of every table, and the file to download.">
+<!-- Preview: keep search engines out until the paper is out. Remove this line at launch. -->
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect width='16' height='16' rx='3' fill='%231d5fb4'/><rect x='4' y='4' width='8' height='1.6' fill='%23fff'/><rect x='4' y='7.2' width='8' height='1.6' fill='%23fff'/><rect x='4' y='10.4' width='5' height='1.6' fill='%23fff'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400;1,8..60,600&amp;display=swap">
+<link rel="stylesheet" href="assets/appendix.css?v=c48a8222">
+</head>
+<body class="with-sitebar">
+<a class="skip" href="#main">Skip to content</a>
+<nav class="sitebar" aria-label="Online appendix">
+  <a class="sitebar-brand" href="index.html">Beyond Market Concentration<span>Online Appendix</span></a>
+  <div class="sitebar-tabs"><a href="index.html">Appendix</a><a href="database.html" aria-current="page">Database</a><a href="handbook.html">Coding Handbook</a></div>
+</nav>
+<header class="topbar">
+  <button class="toc-toggle" type="button" aria-expanded="false" aria-controls="sidebar"><span class="burger" aria-hidden="true"></span>Contents</button>
+  <span class="topbar-current" id="current-label" aria-live="off"></span>
+</header>
+<div class="layout">
+  <aside class="sidebar" id="sidebar" aria-label="Contents">
+    <div class="sidebar-scroll">
+      <a class="sidebar-head" href="#top">
+        <span class="sidebar-eyebrow">Database</span>
+        <span class="sidebar-title">contestability.db</span>
+      </a>
+      <nav class="toc" aria-label="Table of contents">
+<ol class="lvl-0"><li><a href="#top" class="part-link">Database</a><ol class="lvl-1"><li><a href="#db-overview">What it holds</a></li><li><a href="#db-links">How the tables link</a></li><li><a href="#db-scores">Scores</a><ol class="lvl-2"><li><a href="#t-assessments">assessments</a></li><li><a href="#t-v-dimension-scores">v_dimension_scores</a></li><li><a href="#t-v-index">v_index</a></li><li><a href="#t-v-effective">v_effective</a></li></ol></li><li><a href="#db-legal">Legal sources</a><ol class="lvl-2"><li><a href="#t-instruments">instruments</a></li><li><a href="#t-mechanism-legal-basis">mechanism_legal_basis</a></li><li><a href="#t-legal-documents">legal_documents</a></li><li><a href="#t-document-texts">document_texts</a></li><li><a href="#t-provision-extracts">provision_extracts</a></li><li><a href="#t-market-coverage">market_coverage</a></li></ol></li><li><a href="#db-defacto">De Facto evidence</a><ol class="lvl-2"><li><a href="#t-de-facto-sources">de_facto_sources</a></li><li><a href="#t-de-facto-source-links">de_facto_source_links</a></li></ol></li><li><a href="#db-reference">Reference tables</a><ol class="lvl-2"><li><a href="#t-jurisdictions">jurisdictions</a></li><li><a href="#t-dimensions">dimensions</a></li><li><a href="#t-mechanisms">mechanisms</a></li><li><a href="#t-units">units</a></li><li><a href="#t-periods">periods</a></li><li><a href="#t-legal-forms">legal_forms</a></li><li><a href="#t-legal-form-map">legal_form_map</a></li></ol></li><li><a href="#db-other">Search index and build record</a><ol class="lvl-2"><li><a href="#t-search-index">search_index</a></li><li><a href="#t-database-info">database_info</a></li></ol></li></ol></li></ol>
+      </nav>
+    </div>
+  </aside>
+  <div class="backdrop" hidden></div>
+  <main id="main">
+    <div class="content">
+      <header class="doc-head" id="top">
+        <p class="eyebrow">Database</p>
+        <h1>The project database</h1>
+        <p class="doc-actions"><a class="button" href="data/contestability.db?v=80d1714e" download="contestability.db">Download contestability.db</a><span>SQLite · 10.5 MB · built 2026-09-24 21:53 UTC</span></p>
+      </header>
+<h3 id="db-overview">What it holds</h3>
+<p>The database is a single SQLite file holding the records behind the index: the legal instruments in each jurisdiction and their official texts, the provisions each De Jure score rests on, every score in the index, De Jure and De Facto, with its factors, rationale or evidence, and the sources cited for the De Facto scores.</p>
+<p>Scores are stored one per row, in assessments. Dimension scores, indices and Effective Contestability are not stored: the views v_dimension_scores, v_index and v_effective compute them from assessments whenever they are read.</p>
+<p>Each table below can be opened in this page with Show rows. The first time, the page loads the database file (10.5 MB). The same file can be downloaded and opened with any SQLite tool, such as DB Browser for SQLite or the sqlite3 command line.</p>
+<h3 id="db-links">How the tables link</h3>
+<figure class="erd"><figcaption>Scores and the tables they refer to</figcaption><pre class="mermaid">
+erDiagram
+    direction LR
+    legal_forms ||--o{ assessments : "legal_form"
+    mechanisms ||--o{ assessments : "mechanism_id"
+    units ||--o{ assessments : "unit_id"
+    jurisdictions ||--o{ assessments : "jurisdiction"
+    de_facto_sources ||--o{ de_facto_source_links : "source_id"
+    mechanisms ||--o{ de_facto_source_links : "mechanism_id"
+    units ||--o{ de_facto_source_links : "unit_id"
+    legal_forms ||--o{ legal_form_map : "form_code"
+    dimensions ||--o{ mechanisms : "dim_id"
+    jurisdictions ||--o{ units : "jurisdiction"
+    periods ||..o{ assessments : "layer, level, period"
+    assessments ||..o{ v_dimension_scores : "computed"
+    assessments ||..o{ v_index : "computed"
+    assessments ||..o{ v_effective : "computed"
+</pre></figure>
+<figure class="erd"><figcaption>Legal sources</figcaption><pre class="mermaid">
+erDiagram
+    direction LR
+    legal_documents ||--o| document_texts : "doc_id"
+    jurisdictions ||--o{ instruments : "jurisdiction"
+    jurisdictions ||--o{ legal_documents : "jurisdiction"
+    jurisdictions ||--o{ market_coverage : "jurisdiction"
+    jurisdictions ||--o{ mechanism_legal_basis : "jurisdiction"
+    mechanisms ||--o{ mechanism_legal_basis : "mechanism_id"
+    jurisdictions ||--o{ provision_extracts : "jurisdiction"
+    mechanisms ||--o{ provision_extracts : "mechanism_id"
+</pre></figure>
+<p class="table-note">Each line joins two tables and is labelled with the column that links them. Dashed lines lead to the three views, which are computed from assessments; periods is matched on layer, level and period. The key columns of every table are listed under Columns in its section below. search_index and database_info stand alone.</p>
+<h3 id="db-scores">Scores</h3>
+<h4 id="t-assessments">assessments</h4>
+<p class="db-meta">table · 320 rows · 29 columns</p>
+<p>Every score in the index, one row per score, in three sets: De Jure at jurisdiction level (16 mechanisms in 9 jurisdictions, June 2026; 144 rows); De Jure at market level (Google Search and the Apple App Store in December 2023 and June 2026, and Google Play in June 2026; 80 rows); and De Facto (Google Search, the Apple App Store and Google Play in December 2023 and July 2026; 96 rows). A De Jure score is the minimum of its three factor scores. Each row is scored, missing (Applicable but Missing) or not_applicable; only scored rows have a score.</p>
+<details class="db-cols"><summary>Columns (29)</summary><div class="table-wrap"><table class="hb t-cols"><thead><tr><th scope="col">Column</th><th scope="col">Type</th><th scope="col">Key</th><th scope="col">Refers to</th><th scope="col">Note</th></tr></thead><tbody><tr><td><code>assessment_id</code></td><td>integer</td><td>key</td><td></td><td></td></tr><tr><td><code>layer</code></td><td>text</td><td></td><td></td><td>de_jure or de_facto</td></tr><tr><td><code>level</code></td><td>text</td><td></td><td></td><td>jurisdiction (De Jure only) or market</td></tr><tr><td><code>jurisdiction</code></td><td>text</td><td></td><td><a class="xref" href="#t-jurisdictions">jurisdictions</a>.code</td><td></td></tr><tr><td><code>unit_id</code></td><td>text</td><td></td><td><a class="xref" href="#t-units">units</a>.unit_id</td><td>gatekeeper–market pair; empty at jurisdiction level</td></tr><tr><td><code>period</code></td><td>text</td><td></td><td></td><td>baseline (December 2023) or current</td></tr><tr><td><code>observed</code></td><td>text</td><td></td><td></td><td>year and month observed (see periods)</td></tr><tr><td><code>mechanism_id</code></td><td>integer</td><td></td><td><a class="xref" href="#t-mechanisms">mechanisms</a>.mechanism_id</td><td>mechanism 1–16, which is also De Facto indicator D1.1–D4.4</td></tr><tr><td><code>status</code></td><td>text</td><td></td><td></td><td>scored, missing (Applicable but Missing) or not_applicable</td></tr><tr><td><code>score</code></td><td>real</td><td></td><td></td><td>0, 0.5 or 1, only when scored; De Jure: the minimum of existence, scope and enforceability</td></tr><tr><td><code>existence</code></td><td>real</td><td></td><td></td><td>De Jure factor score</td></tr><tr><td><code>scope</code></td><td>real</td><td></td><td></td><td>De Jure factor score</td></tr><tr><td><code>enforceability</code></td><td>real</td><td></td><td></td><td>De Jure factor score</td></tr><tr><td><code>legal_form</code></td><td>text</td><td></td><td><a class="xref" href="#t-legal-forms">legal_forms</a>.form_code</td><td>De Jure: form code F1–F7 or F2g</td></tr><tr><td><code>legal_form_label</code></td><td>text</td><td></td><td></td><td>De Jure, jurisdiction level: the legal-form label used in the coding</td></tr><tr><td><code>basis</code></td><td>text</td><td></td><td></td><td>De Jure: legal basis (full name) or governing provision</td></tr><tr><td><code>instrument_basis</code></td><td>text</td><td></td><td></td><td>De Jure, jurisdiction level: short citation</td></tr><tr><td><code>rationale</code></td><td>text</td><td></td><td></td><td>De Jure: scoring rationale; De Facto: evidence and scoring rationale</td></tr><tr><td><code>confidence</code></td><td>text</td><td></td><td></td><td>De Facto, scored rows: HIGH, MODERATE, LOW-MOD or LOW</td></tr><tr><td><code>market_scope</code></td><td>text</td><td></td><td></td><td>De Jure, jurisdiction level: target market or field</td></tr><tr><td><code>evidence_notes</code></td><td>text</td><td></td><td></td><td>De Jure, jurisdiction level: notes on the evidence</td></tr><tr><td><code>pipeline</code></td><td>text</td><td></td><td></td><td>De Jure, jurisdiction level: the pipeline instrument, where one is tracked</td></tr><tr><td><code>evidence_date</code></td><td>text</td><td></td><td></td><td>De Jure, jurisdiction level: date of the evidence</td></tr><tr><td><code>applicability</code></td><td>text</td><td></td><td></td><td>De Jure, market level: direct (governs the service itself) or adjacent</td></tr><tr><td><code>operative_locus</code></td><td>text</td><td></td><td></td><td>De Jure, market level: where the obligation operates</td></tr><tr><td><code>market_hook</code></td><td>text</td><td></td><td></td><td>De Jure, market level: what the obligation requires in this market</td></tr><tr><td><code>verbatim_extract</code></td><td>text</td><td></td><td></td><td>De Jure, market level: text of the governing provision</td></tr><tr><td><code>source_file</code></td><td>text</td><td></td><td></td><td>De Jure, market level: text file the extract was taken from</td></tr><tr><td><code>record_note</code></td><td>text</td><td></td><td></td><td>how the record was obtained, where that is not self-evident</td></tr></tbody></table></div></details>
+<div class="db-browse" data-table="assessments"><button class="button secondary db-show" type="button">Show rows</button></div>
+<h4 id="t-v-dimension-scores">v_dimension_scores</h4>
+<p class="db-meta">view · 80 rows · 11 columns</p>
+<p>Dimension scores, computed from assessments: for each set, jurisdiction or gatekeeper–market pair, period and dimension, the unweighted mean of the scored items, with the number of items, applicable items and scored items.</p>
+<details class="db-cols"><summary>Columns (11)</summary><div class="table-wrap"><table class="hb t-cols"><thead><tr><th scope="col">Column</th><th scope="col">Type</th><th scope="col">Key</th><th scope="col">Refers to</th><th scope="col">Note</th></tr></thead><tbody><tr><td><code>layer</code></td><td>text</td><td></td><td></td><td></td></tr><tr><td><code>level</code></td><td>text</td><td></td><td></td><td></td></tr><tr><td><code>jurisdiction</code></td><td>text</td><td></td><td></td><td></td></tr><tr><td><code>unit_id</code></td><td>text</td><td></td><td></td><td></td></tr><tr><td><code>period</code></td><td>text</td><td></td><td></td><td></td></tr><tr><td><code>observed</code></td><td>text</td><td></td><td></td><td></td></tr><tr><td><code>dim_id</code></td><td>text</td><td></td><td></td><td></td></tr><tr><td><code>n_items</code></td><td>—</td><td></td><td></td><td>items in the dimension</td></tr><tr><td><code>n_applicable</code></td><td>—</td><td></td><td></td><td>items that apply</td></tr><tr><td><code>n_scored</code></td><td>—</td><td></td><td></td><td>items with a score</td></tr><tr><td><code>score</code></td><td>—</td><td></td><td></td><td>mean of the scored items</td></tr></tbody></table></div></details>
+<div class="db-browse" data-table="v_dimension_scores"><button class="button secondary db-show" type="button">Show rows</button></div>
+<h4 id="t-v-index">v_index</h4>
+<p class="db-meta">view · 20 rows · 11 columns</p>
+<p>The index, computed from the dimension scores: the equal-weighted mean of D1–D4 for each set, jurisdiction or gatekeeper–market pair and period, given only when all four dimensions have a score. The counts of items, applicable items and scored items, and the share of applicable items scored, come with it.</p>
+<details class="db-cols"><summary>Columns (11)</summary><div class="table-wrap"><table class="hb t-cols"><thead><tr><th scope="col">Column</th><th scope="col">Type</th><th scope="col">Key</th><th scope="col">Refers to</th><th scope="col">Note</th></tr></thead><tbody><tr><td><code>layer</code></td><td>text</td><td></td><td></td><td></td></tr><tr><td><code>level</code></td><td>text</td><td></td><td></td><td></td></tr><tr><td><code>jurisdiction</code></td><td>text</td><td></td><td></td><td></td></tr><tr><td><code>unit_id</code></td><td>text</td><td></td><td></td><td></td></tr><tr><td><code>period</code></td><td>text</td><td></td><td></td><td></td></tr><tr><td><code>observed</code></td><td>text</td><td></td><td></td><td></td></tr><tr><td><code>index_score</code></td><td>—</td><td></td><td></td><td>mean of the four dimension scores</td></tr><tr><td><code>n_items</code></td><td>—</td><td></td><td></td><td></td></tr><tr><td><code>n_applicable</code></td><td>—</td><td></td><td></td><td></td></tr><tr><td><code>n_scored</code></td><td>—</td><td></td><td></td><td></td></tr><tr><td><code>share_scored</code></td><td>—</td><td></td><td></td><td>n_scored ÷ n_applicable</td></tr></tbody></table></div></details>
+<div class="db-browse" data-table="v_index"><button class="button secondary db-show" type="button">Show rows</button></div>
+<h4 id="t-v-effective">v_effective</h4>
+<p class="db-meta">view · 6 rows · 11 columns</p>
+<p>Effective Contestability for each gatekeeper–market pair and period, computed from the market-level De Jure and De Facto indices under four formulas: the product (ec_multiplicative), the arithmetic mean with λ = 0.5 (ec_arithmetic), the minimum (ec_bottleneck) and the implementation gap, De Jure minus De Facto (implementation_gap). Google Play has no December 2023 De Jure record, so its baseline row has no Effective value.</p>
+<details class="db-cols"><summary>Columns (11)</summary><div class="table-wrap"><table class="hb t-cols"><thead><tr><th scope="col">Column</th><th scope="col">Type</th><th scope="col">Key</th><th scope="col">Refers to</th><th scope="col">Note</th></tr></thead><tbody><tr><td><code>jurisdiction</code></td><td>text</td><td></td><td></td><td></td></tr><tr><td><code>unit_id</code></td><td>text</td><td></td><td></td><td></td></tr><tr><td><code>period</code></td><td>text</td><td></td><td></td><td></td></tr><tr><td><code>de_jure_observed</code></td><td>text</td><td></td><td></td><td></td></tr><tr><td><code>de_facto_observed</code></td><td>text</td><td></td><td></td><td></td></tr><tr><td><code>de_jure</code></td><td>—</td><td></td><td></td><td>market-level De Jure index</td></tr><tr><td><code>de_facto</code></td><td>—</td><td></td><td></td><td>De Facto index</td></tr><tr><td><code>ec_multiplicative</code></td><td>—</td><td></td><td></td><td>De Jure × De Facto</td></tr><tr><td><code>ec_arithmetic</code></td><td>—</td><td></td><td></td><td>0.5 × De Jure + 0.5 × De Facto</td></tr><tr><td><code>ec_bottleneck</code></td><td>—</td><td></td><td></td><td>the smaller of the two</td></tr><tr><td><code>implementation_gap</code></td><td>—</td><td></td><td></td><td>De Jure − De Facto</td></tr></tbody></table></div></details>
+<div class="db-browse" data-table="v_effective"><button class="button secondary db-show" type="button">Show rows</button></div>
+<h3 id="db-legal">Legal sources</h3>
+<h4 id="t-instruments">instruments</h4>
+<p class="db-meta">table · 46 rows · 8 columns</p>
+<p>The register of legal instruments bearing on the sixteen mechanisms in each jurisdiction: statutes, regulations, court remedies, conduct requirements and administrative rules, including instruments not yet enacted (is_pipeline = 1), with citation, status and a link to the official source.</p>
+<details class="db-cols"><summary>Columns (8)</summary><div class="table-wrap"><table class="hb t-cols"><thead><tr><th scope="col">Column</th><th scope="col">Type</th><th scope="col">Key</th><th scope="col">Refers to</th><th scope="col">Note</th></tr></thead><tbody><tr><td><code>instrument_id</code></td><td>integer</td><td>key</td><td></td><td></td></tr><tr><td><code>jurisdiction</code></td><td>text</td><td></td><td><a class="xref" href="#t-jurisdictions">jurisdictions</a>.code</td><td></td></tr><tr><td><code>name</code></td><td>text</td><td></td><td></td><td></td></tr><tr><td><code>citation</code></td><td>text</td><td></td><td></td><td></td></tr><tr><td><code>status</code></td><td>text</td><td></td><td></td><td>status as recorded, with dates</td></tr><tr><td><code>official_source_label</code></td><td>text</td><td></td><td></td><td></td></tr><tr><td><code>official_source_url</code></td><td>text</td><td></td><td></td><td>link to the official text</td></tr><tr><td><code>is_pipeline</code></td><td>integer</td><td></td><td></td><td>1 = tracked but not enacted</td></tr></tbody></table></div></details>
+<div class="db-browse" data-table="instruments"><button class="button secondary db-show" type="button">Show rows</button></div>
+<h4 id="t-mechanism-legal-basis">mechanism_legal_basis</h4>
+<p class="db-meta">table · 79 rows · 3 columns</p>
+<p>For each mechanism–jurisdiction pair that has one, the article or instrument that governs the mechanism.</p>
+<details class="db-cols"><summary>Columns (3)</summary><div class="table-wrap"><table class="hb t-cols"><thead><tr><th scope="col">Column</th><th scope="col">Type</th><th scope="col">Key</th><th scope="col">Refers to</th><th scope="col">Note</th></tr></thead><tbody><tr><td><code>mechanism_id</code></td><td>integer</td><td>key</td><td><a class="xref" href="#t-mechanisms">mechanisms</a>.mechanism_id</td><td></td></tr><tr><td><code>jurisdiction</code></td><td>text</td><td>key</td><td><a class="xref" href="#t-jurisdictions">jurisdictions</a>.code</td><td></td></tr><tr><td><code>article_basis</code></td><td>text</td><td></td><td></td><td>article or instrument that governs the mechanism</td></tr></tbody></table></div></details>
+<div class="db-browse" data-table="mechanism_legal_basis"><button class="button secondary db-show" type="button">Show rows</button></div>
+<h4 id="t-legal-documents">legal_documents</h4>
+<p class="db-meta">table · 31 rows · 8 columns</p>
+<p>The official legal texts collected for the coding: jurisdiction, instrument, language and the provisions covered, with the file each text was taken from.</p>
+<details class="db-cols"><summary>Columns (8)</summary><div class="table-wrap"><table class="hb t-cols"><thead><tr><th scope="col">Column</th><th scope="col">Type</th><th scope="col">Key</th><th scope="col">Refers to</th><th scope="col">Note</th></tr></thead><tbody><tr><td><code>doc_id</code></td><td>integer</td><td>key</td><td></td><td></td></tr><tr><td><code>jurisdiction</code></td><td>text</td><td></td><td><a class="xref" href="#t-jurisdictions">jurisdictions</a>.code</td><td></td></tr><tr><td><code>file_stem</code></td><td>text</td><td></td><td></td><td>file name without extension</td></tr><tr><td><code>instrument_name</code></td><td>text</td><td></td><td></td><td></td></tr><tr><td><code>language</code></td><td>text</td><td></td><td></td><td>language of the text</td></tr><tr><td><code>provisions_note</code></td><td>text</td><td></td><td></td><td>provisions covered</td></tr><tr><td><code>original_path</code></td><td>text</td><td></td><td></td><td>original file in the project's collection of legal texts</td></tr><tr><td><code>txt_path</code></td><td>text</td><td></td><td></td><td>extracted text file</td></tr></tbody></table></div></details>
+<div class="db-browse" data-table="legal_documents"><button class="button secondary db-show" type="button">Show rows</button></div>
+<h4 id="t-document-texts">document_texts</h4>
+<p class="db-meta">table · 31 rows · 2 columns</p>
+<p>The full text of each legal document, as extracted from the official publication; 3.8 million characters in all. The rows show the start of each text; open a row's text to read all of it.</p>
+<details class="db-cols"><summary>Columns (2)</summary><div class="table-wrap"><table class="hb t-cols"><thead><tr><th scope="col">Column</th><th scope="col">Type</th><th scope="col">Key</th><th scope="col">Refers to</th><th scope="col">Note</th></tr></thead><tbody><tr><td><code>doc_id</code></td><td>integer</td><td>key</td><td><a class="xref" href="#t-legal-documents">legal_documents</a>.doc_id</td><td></td></tr><tr><td><code>content</code></td><td>text</td><td></td><td></td><td>full text</td></tr></tbody></table></div></details>
+<div class="db-browse" data-table="document_texts"><button class="button secondary db-show" type="button">Show rows</button></div>
+<h4 id="t-provision-extracts">provision_extracts</h4>
+<p class="db-meta">table · 60 rows · 8 columns</p>
+<p>The operative text of the provisions the De Jure scores rest on, by mechanism and jurisdiction: the verbatim extract in the original language, a summary, and an English translation where the original is not in English.</p>
+<details class="db-cols"><summary>Columns (8)</summary><div class="table-wrap"><table class="hb t-cols"><thead><tr><th scope="col">Column</th><th scope="col">Type</th><th scope="col">Key</th><th scope="col">Refers to</th><th scope="col">Note</th></tr></thead><tbody><tr><td><code>extract_id</code></td><td>integer</td><td>key</td><td></td><td></td></tr><tr><td><code>mechanism_id</code></td><td>integer</td><td></td><td><a class="xref" href="#t-mechanisms">mechanisms</a>.mechanism_id</td><td></td></tr><tr><td><code>jurisdiction</code></td><td>text</td><td></td><td><a class="xref" href="#t-jurisdictions">jurisdictions</a>.code</td><td></td></tr><tr><td><code>instrument_label</code></td><td>text</td><td></td><td></td><td>short citation, e.g. DMA Art. 6(3)</td></tr><tr><td><code>summary</code></td><td>text</td><td></td><td></td><td></td></tr><tr><td><code>source_txt_path</code></td><td>text</td><td></td><td></td><td>text file the extract comes from (see legal_documents)</td></tr><tr><td><code>extract_text</code></td><td>text</td><td></td><td></td><td>verbatim text, original language</td></tr><tr><td><code>english_translation</code></td><td>text</td><td></td><td></td><td>where the original is not in English</td></tr></tbody></table></div></details>
+<div class="db-browse" data-table="provision_extracts"><button class="button secondary db-show" type="button">Show rows</button></div>
+<h4 id="t-market-coverage">market_coverage</h4>
+<p class="db-meta">table · 99 rows · 7 columns</p>
+<p>For each of eleven markets in each jurisdiction: the binding instruments, the mechanisms they cover, the type of regime, the firms designated or bound, and notes.</p>
+<details class="db-cols"><summary>Columns (7)</summary><div class="table-wrap"><table class="hb t-cols"><thead><tr><th scope="col">Column</th><th scope="col">Type</th><th scope="col">Key</th><th scope="col">Refers to</th><th scope="col">Note</th></tr></thead><tbody><tr><td><code>market</code></td><td>text</td><td>key</td><td></td><td></td></tr><tr><td><code>jurisdiction</code></td><td>text</td><td>key</td><td><a class="xref" href="#t-jurisdictions">jurisdictions</a>.code</td><td></td></tr><tr><td><code>binding_instruments</code></td><td>text</td><td></td><td></td><td></td></tr><tr><td><code>covered_provisions</code></td><td>text</td><td></td><td></td><td>numbers of the mechanisms covered in that market</td></tr><tr><td><code>regime_type</code></td><td>text</td><td></td><td></td><td>type of regime</td></tr><tr><td><code>designated_or_bound_firms</code></td><td>text</td><td></td><td></td><td></td></tr><tr><td><code>notes</code></td><td>text</td><td></td><td></td><td></td></tr></tbody></table></div></details>
+<div class="db-browse" data-table="market_coverage"><button class="button secondary db-show" type="button">Show rows</button></div>
+<h3 id="db-defacto">De Facto evidence</h3>
+<h4 id="t-de-facto-sources">de_facto_sources</h4>
+<p class="db-meta">table · 55 rows · 3 columns</p>
+<p>The sources cited as evidence for the De Facto scores, with title and link.</p>
+<details class="db-cols"><summary>Columns (3)</summary><div class="table-wrap"><table class="hb t-cols"><thead><tr><th scope="col">Column</th><th scope="col">Type</th><th scope="col">Key</th><th scope="col">Refers to</th><th scope="col">Note</th></tr></thead><tbody><tr><td><code>source_id</code></td><td>integer</td><td>key</td><td></td><td></td></tr><tr><td><code>title</code></td><td>text</td><td></td><td></td><td></td></tr><tr><td><code>url</code></td><td>text</td><td></td><td></td><td></td></tr></tbody></table></div></details>
+<div class="db-browse" data-table="de_facto_sources"><button class="button secondary db-show" type="button">Show rows</button></div>
+<h4 id="t-de-facto-source-links">de_facto_source_links</h4>
+<p class="db-meta">table · 90 rows · 3 columns</p>
+<p>Which sources support which indicator for which gatekeeper–market pair.</p>
+<details class="db-cols"><summary>Columns (3)</summary><div class="table-wrap"><table class="hb t-cols"><thead><tr><th scope="col">Column</th><th scope="col">Type</th><th scope="col">Key</th><th scope="col">Refers to</th><th scope="col">Note</th></tr></thead><tbody><tr><td><code>unit_id</code></td><td>text</td><td></td><td><a class="xref" href="#t-units">units</a>.unit_id</td><td></td></tr><tr><td><code>mechanism_id</code></td><td>integer</td><td></td><td><a class="xref" href="#t-mechanisms">mechanisms</a>.mechanism_id</td><td>empty: cited for the whole observation</td></tr><tr><td><code>source_id</code></td><td>integer</td><td></td><td><a class="xref" href="#t-de-facto-sources">de_facto_sources</a>.source_id</td><td></td></tr></tbody></table></div></details>
+<div class="db-browse" data-table="de_facto_source_links"><button class="button secondary db-show" type="button">Show rows</button></div>
+<h3 id="db-reference">Reference tables</h3>
+<h4 id="t-jurisdictions">jurisdictions</h4>
+<p class="db-meta">table · 9 rows · 3 columns</p>
+<p>The nine jurisdictions, with a note on each one's enforcement machinery.</p>
+<details class="db-cols"><summary>Columns (3)</summary><div class="table-wrap"><table class="hb t-cols"><thead><tr><th scope="col">Column</th><th scope="col">Type</th><th scope="col">Key</th><th scope="col">Refers to</th><th scope="col">Note</th></tr></thead><tbody><tr><td><code>code</code></td><td>text</td><td>key</td><td></td><td></td></tr><tr><td><code>name</code></td><td>text</td><td></td><td></td><td></td></tr><tr><td><code>enforcement_note</code></td><td>text</td><td></td><td></td><td></td></tr></tbody></table></div></details>
+<div class="db-browse" data-table="jurisdictions"><button class="button secondary db-show" type="button">Show rows</button></div>
+<h4 id="t-dimensions">dimensions</h4>
+<p class="db-meta">table · 4 rows · 3 columns</p>
+<p>The four dimensions, D1–D4, shared by both layers, with the DMA obligations that the De Facto indicators of each dimension observe.</p>
+<details class="db-cols"><summary>Columns (3)</summary><div class="table-wrap"><table class="hb t-cols"><thead><tr><th scope="col">Column</th><th scope="col">Type</th><th scope="col">Key</th><th scope="col">Refers to</th><th scope="col">Note</th></tr></thead><tbody><tr><td><code>dim_id</code></td><td>text</td><td>key</td><td></td><td></td></tr><tr><td><code>name</code></td><td>text</td><td></td><td></td><td></td></tr><tr><td><code>dma_obligations</code></td><td>text</td><td></td><td></td><td>DMA obligations the De Facto indicators of the dimension observe</td></tr></tbody></table></div></details>
+<div class="db-browse" data-table="dimensions"><button class="button secondary db-show" type="button">Show rows</button></div>
+<h4 id="t-mechanisms">mechanisms</h4>
+<p class="db-meta">table · 16 rows · 6 columns</p>
+<p>The sixteen mechanisms, each in one dimension and each matched to one De Facto indicator (code D1.1–D4.4).</p>
+<details class="db-cols"><summary>Columns (6)</summary><div class="table-wrap"><table class="hb t-cols"><thead><tr><th scope="col">Column</th><th scope="col">Type</th><th scope="col">Key</th><th scope="col">Refers to</th><th scope="col">Note</th></tr></thead><tbody><tr><td><code>mechanism_id</code></td><td>integer</td><td>key</td><td></td><td></td></tr><tr><td><code>name</code></td><td>text</td><td></td><td></td><td></td></tr><tr><td><code>description</code></td><td>text</td><td></td><td></td><td>the contestability channel</td></tr><tr><td><code>dim_id</code></td><td>text</td><td></td><td><a class="xref" href="#t-dimensions">dimensions</a>.dim_id</td><td></td></tr><tr><td><code>code</code></td><td>text</td><td></td><td></td><td>De Facto indicator code</td></tr><tr><td><code>indicator</code></td><td>text</td><td></td><td></td><td>De Facto indicator</td></tr></tbody></table></div></details>
+<div class="db-browse" data-table="mechanisms"><button class="button secondary db-show" type="button">Show rows</button></div>
+<h4 id="t-units">units</h4>
+<p class="db-meta">table · 3 rows · 6 columns</p>
+<p>The three gatekeeper–market pairs observed at market level: Alphabet in online search, and Apple and Alphabet in app distribution, all designated on 6 September 2023.</p>
+<details class="db-cols"><summary>Columns (6)</summary><div class="table-wrap"><table class="hb t-cols"><thead><tr><th scope="col">Column</th><th scope="col">Type</th><th scope="col">Key</th><th scope="col">Refers to</th><th scope="col">Note</th></tr></thead><tbody><tr><td><code>unit_id</code></td><td>text</td><td>key</td><td></td><td></td></tr><tr><td><code>gatekeeper</code></td><td>text</td><td></td><td></td><td></td></tr><tr><td><code>service</code></td><td>text</td><td></td><td></td><td></td></tr><tr><td><code>market</code></td><td>text</td><td></td><td></td><td></td></tr><tr><td><code>jurisdiction</code></td><td>text</td><td></td><td><a class="xref" href="#t-jurisdictions">jurisdictions</a>.code</td><td></td></tr><tr><td><code>designation_date</code></td><td>text</td><td></td><td></td><td>date of the DMA designation</td></tr></tbody></table></div></details>
+<div class="db-browse" data-table="units"><button class="button secondary db-show" type="button">Show rows</button></div>
+<h4 id="t-periods">periods</h4>
+<p class="db-meta">table · 5 rows · 5 columns</p>
+<p>The observation dates for each layer and level: June 2026 for De Jure, July 2026 for De Facto, and December 2023 for the pre-DMA baseline at market level.</p>
+<details class="db-cols"><summary>Columns (5)</summary><div class="table-wrap"><table class="hb t-cols"><thead><tr><th scope="col">Column</th><th scope="col">Type</th><th scope="col">Key</th><th scope="col">Refers to</th><th scope="col">Note</th></tr></thead><tbody><tr><td><code>layer</code></td><td>text</td><td>key</td><td></td><td></td></tr><tr><td><code>level</code></td><td>text</td><td>key</td><td></td><td></td></tr><tr><td><code>period</code></td><td>text</td><td>key</td><td></td><td></td></tr><tr><td><code>observed</code></td><td>text</td><td></td><td></td><td>year and month observed</td></tr><tr><td><code>description</code></td><td>text</td><td></td><td></td><td></td></tr></tbody></table></div></details>
+<div class="db-browse" data-table="periods"><button class="button secondary db-show" type="button">Show rows</button></div>
+<h4 id="t-legal-forms">legal_forms</h4>
+<p class="db-meta">table · 8 rows · 4 columns</p>
+<p>The eight legal forms used to classify instruments (F1–F7 and F2g), with definitions, examples and each form's typical Existence, Scope and Enforceability scores.</p>
+<details class="db-cols"><summary>Columns (4)</summary><div class="table-wrap"><table class="hb t-cols"><thead><tr><th scope="col">Column</th><th scope="col">Type</th><th scope="col">Key</th><th scope="col">Refers to</th><th scope="col">Note</th></tr></thead><tbody><tr><td><code>form_code</code></td><td>text</td><td>key</td><td></td><td></td></tr><tr><td><code>name</code></td><td>text</td><td></td><td></td><td></td></tr><tr><td><code>definition_examples</code></td><td>text</td><td></td><td></td><td>definition and examples</td></tr><tr><td><code>typical_signature</code></td><td>text</td><td></td><td></td><td>typical (E, S, Enf) scores</td></tr></tbody></table></div></details>
+<div class="db-browse" data-table="legal_forms"><button class="button secondary db-show" type="button">Show rows</button></div>
+<h4 id="t-legal-form-map">legal_form_map</h4>
+<p class="db-meta">table · 17 rows · 2 columns</p>
+<p>How the legal-form labels in the De Jure coding (legal_form_label in assessments) map to the form codes.</p>
+<details class="db-cols"><summary>Columns (2)</summary><div class="table-wrap"><table class="hb t-cols"><thead><tr><th scope="col">Column</th><th scope="col">Type</th><th scope="col">Key</th><th scope="col">Refers to</th><th scope="col">Note</th></tr></thead><tbody><tr><td><code>label</code></td><td>text</td><td>key</td><td></td><td></td></tr><tr><td><code>form_code</code></td><td>text</td><td></td><td><a class="xref" href="#t-legal-forms">legal_forms</a>.form_code</td><td></td></tr></tbody></table></div></details>
+<div class="db-browse" data-table="legal_form_map"><button class="button secondary db-show" type="button">Show rows</button></div>
+<h3 id="db-other">Search index and build record</h3>
+<h4 id="t-search-index">search_index</h4>
+<p class="db-meta">full-text index · 203 rows · 5 columns</p>
+<p>A full-text index (SQLite FTS5) over the legal documents, the provision extracts, the market-level De Jure extracts and the De Facto evidence, for searching all of that text at once.</p>
+<details class="db-cols"><summary>Columns (5)</summary><div class="table-wrap"><table class="hb t-cols"><thead><tr><th scope="col">Column</th><th scope="col">Type</th><th scope="col">Key</th><th scope="col">Refers to</th><th scope="col">Note</th></tr></thead><tbody><tr><td><code>kind</code></td><td>—</td><td></td><td></td><td>legal_document, provision_extract, market_provision_extract or de_facto_evidence</td></tr><tr><td><code>ref</code></td><td>—</td><td></td><td></td><td>the row or file the text comes from</td></tr><tr><td><code>jurisdiction</code></td><td>—</td><td></td><td></td><td></td></tr><tr><td><code>title</code></td><td>—</td><td></td><td></td><td></td></tr><tr><td><code>content</code></td><td>—</td><td></td><td></td><td></td></tr></tbody></table></div></details>
+<p class="db-status">This index cannot be opened in the page, because the SQLite that runs in the browser has no full-text module. Download the file to use it. The text it indexes is in document_texts, provision_extracts and assessments.</p>
+<h4 id="t-database-info">database_info</h4>
+<p class="db-meta">table · 8 rows · 2 columns</p>
+<p>When the database was built, the source files it was built from with their SHA-256 hashes, the λ used for the arithmetic Effective formula, and what was left out of the database.</p>
+<details class="db-cols"><summary>Columns (2)</summary><div class="table-wrap"><table class="hb t-cols"><thead><tr><th scope="col">Column</th><th scope="col">Type</th><th scope="col">Key</th><th scope="col">Refers to</th><th scope="col">Note</th></tr></thead><tbody><tr><td><code>key</code></td><td>text</td><td>key</td><td></td><td></td></tr><tr><td><code>value</code></td><td>text</td><td></td><td></td><td></td></tr></tbody></table></div></details>
+<div class="db-browse" data-table="database_info"><button class="button secondary db-show" type="button">Show rows</button></div>
+
+    </div>
+  </main>
+</div>
+<script src="assets/appendix.js?v=a917e893"></script>
+<script src="assets/database.js?v=f0c27c1e" data-db="data/contestability.db?v=80d1714e" data-sqljs="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/"></script>
+<script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
+const dark = matchMedia("(prefers-color-scheme: dark)").matches;
+mermaid.initialize({ startOnLoad: false, theme: dark ? "dark" : "neutral", er: { useMaxWidth: true } });
+await mermaid.run({ querySelector: ".erd .mermaid" });
+</script>
+</body>
+</html>
