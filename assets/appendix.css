@@ -12,6 +12,7 @@
   --rule: #dddcd5;
   --rule-strong: #1a1a18;
   --hover: rgba(0, 0, 0, 0.05);
+  --row-hover: #f3f2ee;
   --accent: #1d5fb4;
   --accent-soft: #e4edf9;
   --note-bg: #f0f0ec;
@@ -46,6 +47,7 @@
     --rule: #30302d;
     --rule-strong: #ecebe6;
     --hover: rgba(255, 255, 255, 0.06);
+    --row-hover: #222220;
     --accent: #6ea8ef;
     --accent-soft: #1b2b40;
     --note-bg: #1f1f1d;
@@ -266,6 +268,13 @@ main {
   font: 700 clamp(28px, 3.4vw, 40px)/1.15 var(--serif);
   letter-spacing: -0.01em;
 }
+.doc-lead {
+  max-width: 46rem;
+  margin: 16px 0 0;
+  color: var(--ink-2);
+  font-size: 18px;
+  line-height: 1.5;
+}
 .part-title {
   margin: 80px 0 12px;
   padding-top: 18px;
@@ -421,18 +430,6 @@ table.hb {
 
 /* ---------------------------------------------------------------- database page */
 
-.erd {
-  margin: 16px 0 10px;
-  padding: 12px;
-  overflow-x: auto;
-  border: 1px solid var(--rule);
-  border-radius: 4px;
-  background: var(--surface);
-}
-.erd figcaption { margin: 0 0 8px; color: var(--ink-2); font: 600 13.5px/1.4 var(--sans); }
-.erd .mermaid { margin: 0; font: 12px/1.4 var(--mono); color: var(--ink-3); }
-.erd svg { display: block; min-width: 640px; margin: 0 auto; }
-
 .db-meta {
   margin: -4px 0 10px;
   color: var(--ink-3);
@@ -448,6 +445,33 @@ table.hb {
 .db-cols .table-wrap { margin-top: 8px; }
 .t-cols { min-width: 620px; }
 .t-cols code, .db-rows th button { font: 12.5px/1.4 var(--mono); }
+
+/* Start here: questions that open a table with its filters set */
+.db-start {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 10px;
+  margin: 14px 0 8px;
+  padding: 0;
+  list-style: none;
+}
+.db-start li { display: flex; }
+.db-q {
+  display: block;
+  width: 100%;
+  padding: 11px 14px 12px;
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--ink);
+  font: 600 14.5px/1.4 var(--sans);
+  text-decoration: none;
+}
+.db-q:hover { border-color: var(--accent); background: var(--accent-soft); }
+.db-q span { display: block; margin-top: 5px; color: var(--ink-3); font: 400 12.5px/1.4 var(--sans); }
+
+/* a table's heading: its plain name, then its name in the database */
+.db-name { margin-left: 6px; color: var(--ink-3); font: 500 0.72em/1 var(--mono); }
 
 .db-browse { margin: 10px 0 34px; }
 .db-toolbar {
@@ -466,15 +490,58 @@ table.hb {
   font: 13.5px/1.3 var(--sans);
 }
 .db-toolbar input[type="search"] { width: 240px; max-width: 100%; }
+.db-toolbar select { max-width: 15rem; }
 .db-filter { display: flex; flex-direction: column; gap: 3px; color: var(--ink-3); }
 .db-filter span { font: 12px var(--mono); }
-.db-toolbar .db-hide { margin-left: auto; }
+.db-clear {
+  padding: 6px 2px;
+  border: 0;
+  background: none;
+  color: var(--accent);
+  font: 600 13px/1.3 var(--sans);
+  cursor: pointer;
+}
 .db-status { margin: 10px 0 0; color: var(--ink-2); font: 13px/1.4 var(--sans); }
+.db-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 12px;
+  margin-top: 12px;
+}
+.db-bar .db-status { margin: 0; }
+.db-actions { display: flex; flex-wrap: wrap; gap: 8px; }
 .db-browse .table-wrap { margin: 8px 0 10px; }
 table.db-rows { font: 12.5px/1.45 var(--sans); }
-.db-rows td { min-width: 80px; max-width: 360px; overflow-wrap: anywhere; }
-.db-rows td:has(.db-more) { min-width: 300px; }
-.db-rows th { padding: 0; }
+.db-rows td { padding-top: 5px; padding-bottom: 5px; white-space: nowrap; }
+.db-c { max-width: 16rem; overflow: hidden; text-overflow: ellipsis; }
+.db-named { color: var(--ink-3); }
+.db-rows tbody tr { cursor: pointer; }
+.db-rows tbody tr:hover > td, .db-rows tbody tr.is-current > td { background: var(--row-hover); }
+.db-rows .db-open-cell {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  width: 1%;
+  padding: 3px 5px;
+  background: var(--surface);
+}
+.db-rows thead .db-open-cell { background: var(--f-head); }
+.db-open {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 24px;
+  padding: 0;
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--accent);
+  cursor: pointer;
+}
+.db-rows tr:hover .db-open { border-color: var(--accent); }
+.db-rows th { padding: 0; white-space: nowrap; }
 .db-rows th button {
   width: 100%;
   padding: 7px 10px;
@@ -485,24 +552,75 @@ table.db-rows { font: 12.5px/1.45 var(--sans); }
   text-align: left;
   cursor: pointer;
 }
+.db-rows th button.has-note { text-decoration: underline dotted var(--ink-3); text-underline-offset: 4px; }
 .db-rows th[aria-sort="ascending"] button::after { content: " ▲"; color: var(--accent); }
 .db-rows th[aria-sort="descending"] button::after { content: " ▼"; color: var(--accent); }
-.db-rows .nil { color: var(--ink-3); }
+.db-rows .nil, .db-fields .nil { color: var(--ink-3); }
+.db-pager { display: flex; gap: 8px; }
+
+/* one row, in full */
+body:has(.db-dialog[open]) { overflow: hidden; }
+.db-dialog {
+  width: min(820px, calc(100vw - 32px));
+  max-height: min(88vh, 960px);
+  padding: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: 0 24px 64px var(--shadow);
+}
+.db-dialog::backdrop { background: rgba(0, 0, 0, 0.45); }
+.db-dialog-head {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--rule);
+  background: var(--surface);
+}
+.db-dialog h2 { flex: 1 1 260px; margin: 0; font: 700 16px/1.35 var(--sans); }
+.db-dialog h2 code { margin-left: 6px; color: var(--ink-3); font: 500 12.5px/1 var(--mono); }
+.db-dialog h2 span { display: block; margin-top: 2px; color: var(--ink-3); font: 400 12.5px/1.4 var(--sans); }
+.db-dialog-nav { display: flex; align-items: center; gap: 8px; }
+.db-close {
+  width: 34px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  background: none;
+  color: var(--ink-2);
+  font: 400 22px/1 var(--sans);
+  cursor: pointer;
+}
+.db-close:hover { background: var(--hover); }
+.db-fields { margin: 0; padding: 4px 16px 16px; }
+.db-fields > div {
+  display: grid;
+  grid-template-columns: minmax(140px, 30%) 1fr;
+  gap: 4px 16px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--rule);
+}
+.db-fields > div:last-child { border-bottom: 0; }
+.db-fields dt code { color: var(--ink); font: 600 12.5px/1.5 var(--mono); overflow-wrap: anywhere; }
+.db-fields dt span { display: block; margin-top: 2px; color: var(--ink-3); font: 12px/1.4 var(--sans); }
+.db-fields dd { min-width: 0; margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; font: 14px/1.55 var(--sans); }
 .db-more {
   padding: 0;
   border: 0;
   background: none;
   color: var(--accent);
-  font: 600 12px var(--sans);
+  font: 600 12.5px var(--sans);
   cursor: pointer;
 }
-.db-long {
-  max-height: 50vh;
-  margin-bottom: 4px;
-  overflow: auto;
-  white-space: pre-wrap;
-}
-.db-pager { display: flex; gap: 8px; }
 
 .doc-foot {
   margin-top: 72px;
@@ -605,6 +723,17 @@ table.db-rows { font: 12.5px/1.45 var(--sans); }
 @media (max-width: 640px) {
   .sitebar-brand { display: none; }
   .sitebar-tabs { flex: 1; justify-content: space-between; }
+  .db-dialog {
+    width: 100%;
+    max-width: 100%;
+    height: 100%;
+    max-height: 100%;
+    margin: 0;
+    border: 0;
+    border-radius: 0;
+  }
+  .db-fields > div { grid-template-columns: 1fr; }
+  .db-dialog-nav .button { padding: 6px 10px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
